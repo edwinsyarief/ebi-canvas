@@ -12,7 +12,16 @@ type Canvas struct {
 	stretched, pixelPerfect bool
 	topLeft, scale          ebimath.Vector
 	buffer                  *ebiten.Image
+	filter                  ScalingFilter
 	renderers               []func(*ebiten.Image)
+}
+
+func (self *Canvas) SetFilter(filter ScalingFilter) {
+	self.filter = filter
+
+	if shaders[filter] == nil {
+		compileShader(filter)
+	}
 }
 
 func (self *Canvas) AddRenderer(renderer func(*ebiten.Image)) {
@@ -98,7 +107,7 @@ func (self *Canvas) Draw(screen *ebiten.Image) {
 	shaderOpts.Uniforms["SourceRelativeTextureUnitY"] = float32(float64(self.height) / float64(screen.Bounds().Dy()))
 	screen.DrawTrianglesShader(
 		shaderVertices, shaderVertIndices,
-		shaders[AASamplingSoft], &shaderOpts,
+		shaders[self.filter], &shaderOpts,
 	)
 	shaderOpts.Images[0] = nil
 }

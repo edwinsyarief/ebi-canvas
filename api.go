@@ -16,15 +16,9 @@ func NewCanvas(width, height int, stretched, pixelPerfect bool) *Canvas {
 		renderers:    make([]func(*ebiten.Image), 0),
 	}
 
-	SetScalingFilter(AASamplingSoft)
+	result.SetFilter(AASamplingSoft)
 
 	return result
-}
-
-func SetScalingFilter(filter ScalingFilter) {
-	if shaders[filter] == nil {
-		compileShader(filter)
-	}
 }
 
 // GetHeight - return 16:9 height from specified width
